@@ -1,3 +1,4 @@
+// src/components/Dashboard.tsx
 import "../App.css";
 import { Button } from "../components/ui/Button";
 import { PlusIcon } from "../icons/PlusIcon";
@@ -9,6 +10,7 @@ import { Sidebar } from "../components/ui/Sidebar";
 import { useContent } from "../hooks/useContent";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
 
@@ -26,10 +28,9 @@ export function Dashboard() {
         return;
       }
       await axios.delete(`${BACKEND_URL}/api/v1/content/${contentId}`, {
-        headers: { "Authorization": token }
+        headers: { Authorization: token },
       });
-      // @ts-ignore
-      setContents(prev => prev.filter(item => item._id !== contentId));
+      setContents((prev) => prev.filter((item) => item._id !== contentId));
       toast.success("Content deleted successfully!", {
         position: "top-right",
         autoClose: 3000,
@@ -39,13 +40,19 @@ export function Dashboard() {
         draggable: true,
       });
     } catch (error) {
-      // @ts-ignore
-      console.error("Delete failed:", error.response?.data || error.message);
-      // @ts-ignore
-      toast.error(error.response?.data?.message || "Failed to delete content", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      if (typeof error === "object" && error !== null && "response" in error) {
+        // @ts-ignore
+        console.error("Delete failed:", error.response?.data || error.message);
+        // @ts-ignore
+        toast.error(
+          // @ts-ignore
+          error.response?.data?.message || "Failed to delete content",
+          { position: "top-right", autoClose: 3000 }
+        );
+      } else {
+        console.error("Delete failed:", error);
+        toast.error("Failed to delete content", { position: "top-right", autoClose: 3000 });
+      }
     }
   };
 
@@ -75,7 +82,7 @@ export function Dashboard() {
           />
           <button
             onClick={() => {
-              navigator.clipboard.writeText(newShareLink);
+              navigator.clipboard.writeText(shareLink || newShareLink);
               toast.info("Link copied to clipboard!", { autoClose: 2000 });
             }}
             className="mt-2 px-4 py-2 bg-blue-500 text-white rounded"
