@@ -10,7 +10,7 @@ import { useContent } from "../hooks/useContent";
 import axios from "axios";
 import { toast } from "react-toastify";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+
 
 export function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
