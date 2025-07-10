@@ -16,7 +16,7 @@ export function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [content, setContent] = useState<string>("all");
   const { contents, setContents, refetch } = useContent({ content });
-  const [shareLink, setShareLink] = useState<string | null>(null);
+  const [, setShareLink] = useState<string | null>(null);
 
   const handleDelete = async (contentId: string) => {
     try {

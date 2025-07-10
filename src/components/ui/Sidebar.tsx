@@ -1,7 +1,4 @@
-import {useState} from "react";
 import { BrainIcon } from "../../icons/Brainly"
-import { HashTagsIcon } from "../../icons/HashTagsIcon"
-import { LinkIcon } from "../../icons/LinkIcon"
 import { TwitterIcon } from "../../icons/TwitterIcon"
 import { YoutubeIcon } from "../../icons/YoutubeIcon"
 import { Button } from "./Button"
