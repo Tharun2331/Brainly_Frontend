@@ -16,7 +16,7 @@ export function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [content, setContent] = useState<string>("all");
   const { contents, setContents, refetch } = useContent({ content });
-  const [, setShareLink] = useState<string | null>(null);
+  const [shareLink, setShareLink] = useState<string | null>(null);
 
   const handleDelete = async (contentId: string) => {
     try {
@@ -69,7 +69,7 @@ export function Dashboard() {
           <p>Share Link Generated!</p>
           <input
             type="text"
-            value={newShareLink}
+            value={shareLink || newShareLink}
             readOnly
             className="w-full p-2 mt-2 border rounded"
           />
