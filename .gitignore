@@ -1,3 +1,4 @@
 # Frontend ignores
 node_modules/
 .env
+dist/
