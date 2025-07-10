@@ -68,7 +68,9 @@ export function Dashboard() {
         { share: true },
         { headers: { Authorization: token } }
       );
-      const newShareLink = `${FRONTEND_URL}/share/${response.data.hash}`;
+      const message = response.data.message || "";
+      const hash = message.startsWith("/share/") ? message.replace("/share/", "") : response.data.hash || "";
+      const newShareLink = `${FRONTEND_URL}/share/${hash}`;
       setShareLink(newShareLink);
 
       toast.success(
