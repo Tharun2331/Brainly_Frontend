@@ -8,7 +8,6 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import {ProtectedRoute } from './components/ProtectedRoute';
 import { BrainIcon } from './icons/Brainly'
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
 
 function App() {
     
