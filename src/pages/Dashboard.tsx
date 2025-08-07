@@ -10,6 +10,7 @@ import { Sidebar } from "../components/ui/Sidebar";
 import { useContent } from "../hooks/useContent";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { ChatIcon } from "../icons/ChatIcon";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
@@ -19,6 +20,12 @@ export function Dashboard() {
   const [content, setContent] = useState<string>("all");
   const { contents, setContents, refetch } = useContent({ content });
   const [shareLink, setShareLink] = useState<string | null>(null);
+  const [selectedNote, setSelectedNote] = useState<{
+    _id: string;
+    description?: string;
+    title?: string;
+    tags?: string[];
+  } | null> (null); 
 
   const handleDelete = async (contentId: string) => {
     try {
@@ -119,12 +126,25 @@ export function Dashboard() {
     }
   };
 
+  const handleEditNote = (note: {_id: string; title?: string; description?: string; tags?: string[] }) => {
+    setSelectedNote(note);
+    setModalOpen(true);
+    
+  }
+
   return (
     <div>
       <Sidebar content={content} setContent={setContent} />
-      <div className="p-4 ml-72 min-h-screen bg-[var(--color-gray-200)]">
-        <CreateContentModal open={modalOpen} onClose={() => setModalOpen(false)} />
-        <div className="flex justify-end gap-4">
+      <div className="p-4 ml-4 md:ml-72 min-h-screen bg-[var(--color-gray-200)]">
+        <CreateContentModal open={modalOpen}
+          onClose={() => { 
+          setModalOpen(false) 
+          setSelectedNote(null)
+          }}
+          selectedNote = {selectedNote}
+          setContents={setContents}
+       />
+        <div className="flex justify-center  md:flex md:justify-end gap-4">
           <Button
             startIcon={<ShareIcon size="md" />}
             variant="secondary"
@@ -141,19 +161,26 @@ export function Dashboard() {
           />
         </div>
         <div className="flex gap-6 flex-wrap p-4">
-          {contents.map(({ type, link, title, _id, tags }) => (
+          {contents.map(({ type, link, title, description, _id, tags }) => (
             <Card
               key={`${type}-${link}`}
-              type={type as "twitter" | "youtube"}
+              type={type as "twitter" | "youtube" | "article" | "note"}
               link={link}
               title={title}
+              description={description}
               contentId={_id}
               tags={tags}
               onDelete={handleDelete}
+              onClick={() => type === "note" && handleEditNote({_id, title, description, tags: tags?.map(tag => tag.tag) || [] })}
             />
           ))}
         </div>
+        {/* <div className="flex justify-end mt-4 mr-2">
+            <Button startIcon={<ChatIcon size="30px"/>} variant="primary" className="rounded-xl w-15 h-15" />
+        </div> */}
       </div>
+
+
     </div>
   );
 }

@@ -49,12 +49,13 @@ export const Share = () => {
       </div>
       <h1>Shared Content by {username}</h1>
       <div className="flex gap-6 flex-wrap">
-        {contents.map(({ type, link, title, _id, tags }) => (
+        {contents.map(({ type, link, description, title, _id, tags }) => (
           <Card
             key={`${type}-${link}`}
             type={type}
             link={link}
             title={title}
+            description={description}
             contentId={_id}
             tags={tags}
           />
