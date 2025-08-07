@@ -45,8 +45,8 @@ const handleSubmit = async () => {
 return <div className="h-screen w-screen bg-[var(--color-gray-200)] flex justify-center items-center">
 
   <div className="bg-white rounded-xl border-1 border-gray-300  min-w-48 p-10">
-    <Input placeholder="Email Address" ref={userNameRef} />
-    <Input placeholder="Password" ref={passwordRef} />
+    <Input placeholder="Email Address" ref={userNameRef} required={true} />
+    <Input placeholder="Password" ref={passwordRef} required={true} />
     <div className="flex justify-center items-center pt-4">
       <Button  variant="primary" text="Signin" fullWidth= {true} loading={loading} onClick={handleSubmit} />
     </div>

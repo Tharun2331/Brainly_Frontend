@@ -10,7 +10,7 @@ import { Sidebar } from "../components/ui/Sidebar";
 import { useContent } from "../hooks/useContent";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ChatIcon } from "../icons/ChatIcon";
+// import { ChatIcon } from "../icons/ChatIcon";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
