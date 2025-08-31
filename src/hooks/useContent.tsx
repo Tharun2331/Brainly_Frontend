@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL =  "http://localhost:3000";
-// import.meta.env.VITE_BACKEND_URL ||
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 interface Tag {
   _id: string;
   tag: string;
