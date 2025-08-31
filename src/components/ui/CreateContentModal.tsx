@@ -20,34 +20,73 @@ export function CreateContentModal({
    open,
   onClose,
   selectedNote,
-  
-  setContents }: { 
+  setContents 
+}: { 
     open: boolean;
     onClose: () => void;
     selectedNote?: { _id: string; title?: string; description?: string; tags?: string[] } | null;
     setContents: (newContents: any[]) => void;
-
 }) {
   const modref = useOutsideClick(onClose);
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
   const tagRef = useRef<HTMLInputElement>(null);
-  const descriptionRef = useRef<HTMLInputElement | null>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
   const noteRef = useRef<HTMLTextAreaElement | null>(null);
   const noteTagRef = useRef<HTMLInputElement | null>(null);
-  const noteTitleRef = useRef<HTMLInputElement | null>(null); // New ref for Note title
+  const noteTitleRef = useRef<HTMLInputElement | null>(null);
+  
   const [type, setType] = useState(ContentType.Youtube);
   const [error, setError] = useState<string | null>(null);
+  
+  // Add state for form values to ensure proper initialization
+  const [formValues, setFormValues] = useState({
+    title: "",
+    description: "",
+    tags: "",
+    link: ""
+  });
 
-  useEffect(()=> {
-    if(selectedNote && open)
-    {
-      setType(ContentType.Note);
-      if(noteTitleRef.current) noteTitleRef.current.value = selectedNote.title || "";
-      if(noteRef.current) noteRef.current.value = selectedNote.description || "";
-      if(noteTagRef.current) noteTagRef.current.value = selectedNote.tags?.join(",") ||  ""; 
+  // Reset form when modal opens/closes or selectedNote changes
+  useEffect(() => {
+    if (open) {
+      if (selectedNote) {
+        // Editing existing note
+        setType(ContentType.Note);
+        const newFormValues = {
+          title: selectedNote.title || "",
+          description: selectedNote.description || "",
+          tags: selectedNote.tags?.join(", ") || "",
+          link: ""
+        };
+        setFormValues(newFormValues);
+        
+        // Use setTimeout to ensure refs are available after render
+        setTimeout(() => {
+          if (noteTitleRef.current) noteTitleRef.current.value = newFormValues.title;
+          if (noteRef.current) noteRef.current.value = newFormValues.description;
+          if (noteTagRef.current) noteTagRef.current.value = newFormValues.tags;
+        }, 0);
+      } else {
+        // Creating new content - reset everything
+        setType(ContentType.Youtube);
+        const resetValues = { title: "", description: "", tags: "", link: "" };
+        setFormValues(resetValues);
+        
+        setTimeout(() => {
+          // Clear all form fields
+          if (titleRef.current) titleRef.current.value = "";
+          if (linkRef.current) linkRef.current.value = "";
+          if (tagRef.current) tagRef.current.value = "";
+          if (descriptionRef.current) descriptionRef.current.value = "";
+          if (noteRef.current) noteRef.current.value = "";
+          if (noteTagRef.current) noteTagRef.current.value = "";
+          if (noteTitleRef.current) noteTitleRef.current.value = "";
+        }, 0);
+      }
+      setError(null);
     }
-  },[selectedNote,open])
+  }, [open, selectedNote]);
 
   const addContent = async () => {
     const title = titleRef.current?.value;
@@ -100,11 +139,10 @@ export function CreateContentModal({
         contentPayload.title = title;
         contentPayload.link = link;
       } else if (noteTitle) {
-        contentPayload.title = noteTitle; // Include title for Notes if provided
+        contentPayload.title = noteTitle;
       }
 
-      if(selectedNote)
-      {
+      if (selectedNote) {
         // Update the existing note
         await axios.put(`${BACKEND_URL}/api/v1/content/${selectedNote._id}`, contentPayload, {
           headers: {
@@ -112,10 +150,10 @@ export function CreateContentModal({
           },
         });
         // @ts-ignore
-        setContents((prev)=> 
-        prev.map((item) => 
-          item._id === selectedNote._id ? {...item, ...contentPayload, tags: tagIds} : item) 
-      )
+        setContents((prev) => 
+          prev.map((item) => 
+            item._id === selectedNote._id ? {...item, ...contentPayload, tags: tagIds} : item) 
+        );
       } else {
         // Create new content
         const response = await axios.post(`${BACKEND_URL}/api/v1/content`, contentPayload, {
@@ -136,7 +174,6 @@ export function CreateContentModal({
     }
   };
 
-
   return (
     <div>
       {open && (
@@ -151,9 +188,17 @@ export function CreateContentModal({
                   </div>
                 </div>
                 {type === ContentType.Note ? (
-                  <Note ref={noteRef} tagRef={noteTagRef} titleRef={noteTitleRef} />
+                  <Note 
+                    ref={noteRef} 
+                    tagRef={noteTagRef} 
+                    titleRef={noteTitleRef}
+                    defaultTitle={formValues.title}
+                    defaultTags={formValues.tags}
+                    defaultValue={formValues.description}
+                    key={`note-${selectedNote?._id || 'new'}`} // Force re-render when selectedNote changes
+                  />
                 ) : (
-                  <div>
+                  <div key={`content-${type}`}>
                     <Input ref={titleRef} placeholder={"Title"} required={true} />
                     <Input ref={linkRef} placeholder={"Link"} required={true} />
                     <Input ref={tagRef} placeholder={"Tags"} required={true} />

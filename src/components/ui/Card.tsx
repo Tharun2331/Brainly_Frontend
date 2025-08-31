@@ -23,7 +23,7 @@ interface Cardprops {
   contentId: string;
   onDelete?: (contentId: string) => void;
   description?: string;
-  onClick?:() => void;
+  onClick?: () => void;
 }
 
 export const Card = ({ title, link, type, contentId, onDelete, tags, description, onClick }: Cardprops) => {
@@ -36,7 +36,8 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
   const truncatedDescription =
     safeDescription.length > 100 ? safeDescription.substring(0, 100) + "..." : safeDescription;
 
-  const handleDelete = () => {
+  const handleDelete = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering onClick when deleting
     if (contentId) {
       onDelete && onDelete(contentId);
     } else {
@@ -45,6 +46,12 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
         position: "top-right",
         autoClose: 3000,
       });
+    }
+  };
+
+  const handleNoteClick = () => {
+    if (type === "note" && onClick) {
+      onClick();
     }
   };
 
@@ -91,7 +98,12 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
 
   return (
     <div>
-      <div className="p-4 bg-white rounded-md shadow-md border-gray-200 border max-w-72 text-sm font-normal min-h-48 min-w-72">
+      <div 
+        className={`p-4 bg-white rounded-md shadow-md border-gray-200 border max-w-72 text-sm font-normal min-h-48 min-w-72 ${
+          type === "note" ? "cursor-pointer hover:shadow-lg transition-shadow duration-200" : ""
+        }`}
+        onClick={type === "note" ? handleNoteClick : undefined}
+      >
         <div className="flex justify-between">
           <div className="flex items-center">
             <div className="text-gray-500 pr-2">
@@ -105,12 +117,20 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
           <div className="flex items-center">
             {link && (
               <div className="pr-2 text-gray-400">
-                <a href={link} target="_blank" rel="noopener noreferrer">
+                <a 
+                  href={link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()} // Prevent triggering note edit
+                >
                   <ShareIcon size="md" />
                 </a>
               </div>
             )}
-            <div className="pr-2 text-gray-400 cursor-pointer" onClick={handleDelete}>
+            <div 
+              className="pr-2 text-gray-400 cursor-pointer hover:text-red-500 transition-colors duration-200" 
+              onClick={handleDelete}
+            >
               <DeleteIcon size="md" />
             </div>
           </div>
@@ -147,14 +167,21 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
               </Link>
             </div>
           )}
-          {type === "note" && <p className="text-gray-700 cursor-pointer" onClick = {onClick}>{
-          truncatedDescription
-          }</p>}
+          
+          {type === "note" && (
+            <div className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
+              <p>{truncatedDescription}</p>
+              {type === "note" && (
+                <div className="mt-2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  Click to edit
+                </div>
+              )}
+            </div>
+          )}
         </div>
         {safeTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-8 ">
-            {
-            safeTags.map((tagObj) =>
+          <div className="flex flex-wrap gap-2 mt-8">
+            {safeTags.map((tagObj) =>
               tagObj && tagObj.tag ? (
                 <span
                   key={tagObj._id}

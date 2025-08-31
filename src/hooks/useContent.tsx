@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-
+const BACKEND_URL =  "http://localhost:3000";
+// import.meta.env.VITE_BACKEND_URL ||
 interface Tag {
   _id: string;
   tag: string;
@@ -44,13 +44,13 @@ export function useContent({ content }: UseContentProps) {
         responseKey = "twitter";
       } else if (content === "youtube") {
         url = `${BACKEND_URL}/api/v1/content/youtube`;
-        responseKey = "youtubeVideos";
+        responseKey = "youtube";
       } else if (content === "article") {
         url = `${BACKEND_URL}/api/v1/content/articles`;
-        responseKey = "articles";
+        responseKey = "article";
       } else if (content === "note") {
         url = `${BACKEND_URL}/api/v1/content/notes`;
-        responseKey = "notes";
+        responseKey = "note";
       } else {
         url = `${BACKEND_URL}/api/v1/content`;
         responseKey = "content";
