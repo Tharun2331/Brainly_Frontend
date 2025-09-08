@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.9.0",
     "@types/cors": "^2.8.19",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.10.0",
@@ -17,6 +18,7 @@
     "dotenv": "^17.2.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-redux": "^9.2.0",
     "react-router-dom": "^7.6.2",
     "react-toastify": "^11.0.5"
   },
