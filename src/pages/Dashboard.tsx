@@ -13,14 +13,11 @@ import { useAppDispatch,useAppSelector } from "../hooks/redux";
 import { deleteContent, fetchContents } from "../store/slices/contentSlice";
 // import { ChatIcon } from "../icons/ChatIcon";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
-
 export function Dashboard() {
   const dispatch = useAppDispatch();
   const {token} = useAppSelector(state => state.auth);
-  const {shareLink,shareLoading, shareError} = useAppSelector(state => state.ui);
-  const {contents, loading, filter} = useAppSelector(state => state.content);
+  const {shareLoading, shareError} = useAppSelector(state => state.ui);
+  const {contents, filter} = useAppSelector(state => state.content);
   const [modalOpen, setModalOpen] = useState(false);
 
   const [selectedNote, setSelectedNote] = useState<{
@@ -157,6 +154,7 @@ export function Dashboard() {
             variant="primary"
             text="Add Content"
             size="md"
+
           />
         </div>
         {shareError && (

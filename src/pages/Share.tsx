@@ -1,43 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { Card } from "../components/ui/Card"; // Reuse the Card component
 import { Button } from "../components/ui/Button";
 import { fetchSharedContents } from "../store/slices/contentSlice";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 
 export const Share = () => {
 
   const { shareId } = useParams<{ shareId: string }>(); // Get hash from URL
   const dispatch = useAppDispatch();
-  // const [contents, setContents] = useState<any[]>([]);
-  // const [username, setUsername] = useState<string>("");
-  // const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState<string | null>(null);
+
   const {
     sharedContents,
     sharedUsername,
     sharedLoading,
     sharedError
   } = useAppSelector(state => state.content);
-  // const fetchSharedContent = async () => {
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     const response = await axios.get(`${BACKEND_URL}/api/v1/brain/${shareId}`);
-  //     const { content, username: userName } = response.data;
-  //     console.log("Fetched shared content:", content); // Debug: log the content array
-  //     setContents(content || []);
-  //     setUsername(userName || "Unknown User");
-  //   } catch (err) {
-  //     setError("Failed to load shared content. Check the link or try again.");
-  //     console.error("Error fetching shared content:", err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+
   useEffect(() => {
     if (shareId) {
       dispatch(fetchSharedContents(shareId));

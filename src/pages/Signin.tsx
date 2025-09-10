@@ -10,7 +10,7 @@ export function Signin()
 const [username, setUsername] = useState("");
 const [password, setPassword] = useState("");
 const dispatch = useAppDispatch();
-const { loading, error, isAuthenticated } = useAppSelector(state => state.auth);
+const { loading, isAuthenticated } = useAppSelector(state => state.auth);
 const navigate = useNavigate();
   
 // Clear any existing errors when component mounts

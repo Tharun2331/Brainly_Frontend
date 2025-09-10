@@ -13,7 +13,7 @@ const [username, setUsername] = useState("");
 const [password, setPassword] = useState("");
 const navigate = useNavigate();
 const dispatch = useAppDispatch();
-const {loading, error} = useAppSelector(state => state.auth);
+const {loading} = useAppSelector(state => state.auth);
 const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
 

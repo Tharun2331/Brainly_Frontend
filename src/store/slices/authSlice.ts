@@ -1,6 +1,6 @@
 import {createSlice, createAsyncThunk, type PayloadAction} from "@reduxjs/toolkit";
 import axios from "axios";
-import {type AuthState,type User} from "../types/index";
+import {type AuthState} from "../types/index";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 

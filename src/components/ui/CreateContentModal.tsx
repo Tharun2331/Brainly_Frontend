@@ -7,10 +7,10 @@ import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { Note } from "../../components/ui/Note";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { createContent, updateContent, fetchContents } from "../../store/slices/contentSlice";
-import axios from "axios";
+
 import { toast } from "react-toastify";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+
 // @ts-ignore
 enum ContentType {
   Youtube = "youtube",
@@ -224,34 +224,38 @@ export function CreateContentModal({
                     variant={type === ContentType.Youtube ? "primary" : "secondary"}
                     onClick={() => setType(ContentType.Youtube)}
                     size="md"
+                    loading={loading}
                   />
                   <Button
                     text="Twitter"
                     variant={type === ContentType.Twitter ? "primary" : "secondary"}
                     onClick={() => setType(ContentType.Twitter)}
                     size="md"
+                    loading={loading}
                   />
                   <Button
                     text="Article"
                     variant={type === ContentType.Article ? "primary" : "secondary"}
                     onClick={() => setType(ContentType.Article)}
                     size="md"
+                    loading={loading}
                   />
                   <Button
                     text="Note"
                     variant={type === ContentType.Note ? "primary" : "secondary"}
                     onClick={() => setType(ContentType.Note)}
                     size="md"
+                    loading={loading}
                   />
                 </div>
                 <div className="flex justify-center">
-                  <Button variant="primary" text="submit" size="sm" onClick={addContent} />
+                  <Button variant="primary" text="submit" size="sm" onClick={addContent}  loading={loading} />
                 </div>
               </span>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </div>  
   );
 }
