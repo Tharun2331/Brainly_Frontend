@@ -64,7 +64,7 @@ const authSlice = createSlice({
       state.error=action.error.message || "Signup Failed";
     })
     .addCase(signinUser.pending, (state)=> {
-      state.loading=false;
+      state.loading=true;
       state.error=null;
     })
     .addCase(signinUser.fulfilled, (state,action) => {

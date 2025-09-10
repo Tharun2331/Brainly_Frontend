@@ -107,12 +107,25 @@ export const deleteContent = createAsyncThunk(
   }
 );
 
+export const fetchSharedContents = createAsyncThunk(
+  'content/fetchSharedContent',
+  async (shareId: string) => {
+    const response = await  axios.get(`${BACKEND_URL}/api/v1/brain/${shareId}`);
+    return response.data;
+  }
+)
+
+
 const initialState: ContentState = {
   contents: [],
   selectedContent: null,
   loading: false,
   error: null,
   filter: "all",
+  sharedContents: [],
+  sharedUsername: "",
+  sharedLoading: false,
+  sharedError: null,
 };
 
 
@@ -155,7 +168,20 @@ const contentSlice = createSlice({
       })
       .addCase(deleteContent.fulfilled, (state, action) => {
         state.contents = state.contents.filter(c => c._id !== action.payload);
-      });
+      })
+      .addCase(fetchSharedContents.pending, (state) => {
+        state.sharedLoading=true;
+        state.sharedError = null;
+      })
+      .addCase(fetchSharedContents.fulfilled, (state, action) => {
+        state.sharedLoading = false;
+        state.sharedContents = action.payload.content || [];
+        state.sharedUsername = action.payload.username || "Unknown User";
+      })
+      .addCase(fetchSharedContents.rejected, (state,action) => {
+        state.sharedLoading = false;
+        state.sharedError = action.error.message || "Failed to fetch shared content";
+      })
   },
 });
 

@@ -6,22 +6,31 @@ import { YoutubeIcon } from "../../icons/YoutubeIcon"
 import { Button } from "./Button"
 import { SidebarItem } from "./SidebarItem"
 import { useNavigate } from "react-router-dom"
+import { useAppDispatch, useAppSelector } from "../../hooks/redux"
+import { logout } from "../../store/slices/authSlice"
+import { setFilter } from "../../store/slices/contentSlice"
 
-interface SidebarProps {
-  content: string;
-  setContent: (type: string) => void;
-}
+// interface SidebarProps {
+//   content: string;
+//   handleSetContent: (type: string) => void;
+// }
 
-export function Sidebar({content, setContent}: SidebarProps) {
+export function Sidebar() {
 
 
   const navigate= useNavigate();
+  const dispatch = useAppDispatch();
+
+  const currentFilter = useAppSelector(state => state.content.filter);
   
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    dispatch(logout());
     navigate("/signin");
   }
 
+  const handleSetContent = (filterType: "all" | "twitter" | "youtube" | "article" | "note") => {
+    dispatch(setFilter(filterType));
+  }
 
 
   return (
@@ -37,33 +46,33 @@ export function Sidebar({content, setContent}: SidebarProps) {
           <SidebarItem 
           text={"Tweets"}
           icon={<TwitterIcon />} 
-          onClick={()=> setContent("twitter")}
-          isActive = {content === "twitter"}/>
+          onClick={()=> handleSetContent("twitter")}
+          isActive = {currentFilter === "twitter"}/>
           <SidebarItem
           text={"Youtube"} 
           icon={<YoutubeIcon />}  
-          onClick={()=> setContent("youtube")}
-          isActive = {content === "youtube"} />
+          onClick={()=> handleSetContent("youtube")}
+          isActive = {currentFilter === "youtube"} />
          
          <SidebarItem 
          text={"Articles"}
          icon={<ArticleIcon />}
-         onClick={() => setContent("article")}
-         isActive={content ==="article"}
+         onClick={() => handleSetContent("article")}
+         isActive={currentFilter ==="article"}
          />
 
         <SidebarItem 
          text={"Notes"}
          icon={<NoteIcon />}
-         onClick={() => setContent("note")}
-         isActive={content ==="note"}
+         onClick={() => handleSetContent("note")}
+         isActive={currentFilter ==="note"}
          />
          
          <SidebarItem
           text={"All"} 
           icon={<BrainIcon />}  
-          onClick={()=> setContent("All")}
-          isActive = {content === "All"}
+          onClick={()=> handleSetContent("all")}
+          isActive = {currentFilter === "all"}
           />
 
         </div>

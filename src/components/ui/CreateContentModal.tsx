@@ -5,7 +5,10 @@ import { Button } from "./Button";
 import { Input, MultiInput } from "./Input";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { Note } from "../../components/ui/Note";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { createContent, updateContent, fetchContents } from "../../store/slices/contentSlice";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 // @ts-ignore
@@ -20,13 +23,17 @@ export function CreateContentModal({
    open,
   onClose,
   selectedNote,
-  setContents 
+   
 }: { 
     open: boolean;
     onClose: () => void;
     selectedNote?: { _id: string; title?: string; description?: string; tags?: string[] } | null;
-    setContents: (newContents: any[]) => void;
+
 }) {
+  const dispatch = useAppDispatch();
+  const {token} = useAppSelector(state => state.auth);
+  const {filter} = useAppSelector(state => state.content);
+
   const modref = useOutsideClick(onClose);
   const titleRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLInputElement>(null);
@@ -38,7 +45,8 @@ export function CreateContentModal({
   
   const [type, setType] = useState(ContentType.Youtube);
   const [error, setError] = useState<string | null>(null);
-  
+  const [loading, setLoading] = useState(false);
+
   // Add state for form values to ensure proper initialization
   const [formValues, setFormValues] = useState({
     title: "",
@@ -85,10 +93,16 @@ export function CreateContentModal({
         }, 0);
       }
       setError(null);
+      setLoading(false);
     }
   }, [open, selectedNote]);
 
   const addContent = async () => {
+    if (!token) {
+      setError("No authorization token found. Please log in.");
+      return;
+    }
+
     const title = titleRef.current?.value;
     const link = linkRef.current?.value;
     const description = type === ContentType.Note ? noteRef.current?.value : descriptionRef.current?.value;
@@ -111,68 +125,66 @@ export function CreateContentModal({
       return;
     }
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setError("No authorization token found");
-      return;
-    }
-
     try {
+      setLoading(true);
       setError(null);
-      const tagRes = await axios.post(
-        `${BACKEND_URL}/api/v1/tags`,
-        { tags },
-        {
-          headers: {
-            Authorization: token,
-          },
-        }
-      );
-      const tagIds = tagRes.data.tagIds;
 
-      const contentPayload: any = {
+      // Prepare content data
+      const contentData: any = {
         description,
         type,
-        tags: tagIds,
+        tags, // Pass tag names, Redux will handle converting to IDs
       };
+
       if (type !== ContentType.Note) {
-        contentPayload.title = title;
-        contentPayload.link = link;
+        contentData.title = title;
+        contentData.link = link;
       } else if (noteTitle) {
-        contentPayload.title = noteTitle;
+        contentData.title = noteTitle;
       }
 
       if (selectedNote) {
-        // Update the existing note
-        await axios.put(`${BACKEND_URL}/api/v1/content/${selectedNote._id}`, contentPayload, {
-          headers: {
-            Authorization: token 
-          },
+        // Update existing content
+        await dispatch(updateContent({ 
+          id: selectedNote._id, 
+          contentData, 
+          token 
+        })).unwrap();
+        
+        toast.success("Content updated successfully!", {
+          position: "top-right",
+          autoClose: 3000,
         });
-        // @ts-ignore
-        setContents((prev) => 
-          prev.map((item) => 
-            item._id === selectedNote._id ? {...item, ...contentPayload, tags: tagIds} : item) 
-        );
       } else {
         // Create new content
-        const response = await axios.post(`${BACKEND_URL}/api/v1/content`, contentPayload, {
-          headers: { Authorization: token },
+        await dispatch(createContent({ 
+          contentData, 
+          token 
+        })).unwrap();
+        
+        toast.success("Content created successfully!", {
+          position: "top-right",
+          autoClose: 3000,
         });
-        // @ts-ignore
-        setContents((prev) => [...prev, response.data]);
       }
 
+      // Refetch contents to ensure UI is up to date
+      dispatch(fetchContents({ filter, token }));
+      
+      // Close modal
       onClose();
     } catch (error: any) {
-      console.error("Error creating content:", error);
-      if (error.response) {
-        setError(error.response.data.message || "Failed to create content");
-      } else {
-        setError("An unexpected error occurred");
-      }
+      console.error("Error with content operation:", error);
+      setError(error.message || "An unexpected error occurred");
+      toast.error(error.message || "Failed to save content", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } finally {
+      setLoading(false);
     }
   };
+
 
   return (
     <div>

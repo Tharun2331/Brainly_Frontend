@@ -1,5 +1,10 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type UIState } from '../types/index';
+import axios from "axios";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+
 
 const initialState: UIState = {
   modals: {
@@ -8,7 +13,26 @@ const initialState: UIState = {
   },
   shareLink: null,
   selectedNote: null,
+  shareLoading: false,
+  shareError:null,
 };
+
+export const generateShareLink = createAsyncThunk(
+  'ui/generateShareLink',
+  async (token: string) => {
+    const response = await axios.post(
+      `${BACKEND_URL}/api/v1/brain/share`,
+      {share: true},
+      {headers: {Authorization: token}}
+    );
+    const hash = response.data.hash || "";
+
+    const baseUrl = FRONTEND_URL.endsWith("/") ? FRONTEND_URL.slice(0,-1) : FRONTEND_URL;
+    const shareLink = `${baseUrl}/share/${hash}`;
+    
+    return shareLink;
+  }
+)
 
 const uiSlice = createSlice({
   name: 'ui',
@@ -37,7 +61,26 @@ const uiSlice = createSlice({
       state.modals.share = false;
       state.selectedNote = null;
     },
+    clearShareLink: (state) => {
+      state.shareLink = null;
+      state.shareError = null;
+    }
   },
+  extraReducers: (builder) => {
+    builder
+    .addCase(generateShareLink.pending, (state) => {
+      state.shareLoading=true;
+      state.shareError=null;
+    })
+    .addCase(generateShareLink.fulfilled, (state,action) => {
+      state.shareLoading = false;
+      state.shareLink = action.payload;
+    })
+    .addCase(generateShareLink.rejected, (state, action)=> {
+      state.shareLoading=false;
+      state.shareError = action.error.message || "Failed to generate share link";
+    })
+  }
 });
 
 export const { 
@@ -45,6 +88,7 @@ export const {
   toggleShareModal, 
   setShareLink, 
   setSelectedNote, 
-  closeAllModals 
+  closeAllModals,
+  clearShareLink 
 } = uiSlice.actions;
 export default uiSlice.reducer;

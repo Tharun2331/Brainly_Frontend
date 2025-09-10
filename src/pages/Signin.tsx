@@ -1,52 +1,68 @@
 import { Button } from "../components/ui/Button";
 import {Input} from "../components/ui/Input";
-import { useState,useRef } from "react";
-
-import axios from "axios";
+import { useState,useEffect } from "react";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { signinUser,clearError  } from "../store/slices/authSlice";
 export function Signin()
 {
-const [loading, setLoading] = useState(false);
-const userNameRef = useRef<HTMLInputElement>(null);
-const passwordRef = useRef<HTMLInputElement>(null);
+const [username, setUsername] = useState("");
+const [password, setPassword] = useState("");
+const dispatch = useAppDispatch();
+const { loading, error, isAuthenticated } = useAppSelector(state => state.auth);
 const navigate = useNavigate();
-const handleSubmit = async () => {
-    const userName = userNameRef.current?.value;
-    const password = passwordRef.current?.value;
+  
+// Clear any existing errors when component mounts
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
 
-    if (!userName || !password) {
-      alert("Please fill in both email and password.");
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async () => {
+    // Clear any previous errors
+    dispatch(clearError());
+
+    if (!username || !password) {
+      toast.error("Please fill in both username and password.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
       return;
     }
 
-    setLoading(true);
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/v1/signin`, {
-        username: userName, // Match the backend's expected field name
-        password,          // Directly include password
-      });
-      const jwt = response.data.token;
-      localStorage.setItem("token",jwt)
-      // Redirect to Dashboard
-      navigate("/dashboard")
-
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        alert(`Signin failed: ${error.response?.data?.message || error.message}`);
-      } else {
-        alert("An unexpected error occurred.");
+      // Dispatch Redux action
+      const resultAction = await dispatch(signinUser({ username, password }));
+      
+      if (signinUser.fulfilled.match(resultAction)) {
+        toast.success("Signed in successfully!", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+        // Navigation will happen automatically due to useEffect above
       }
-    } finally {
-      setLoading(false); // Reset loading regardless of success or failure
+    } catch (error) {
+      // Error handling is done by Redux, but we can show a toast
+      toast.error("Signin failed. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     }
   };
+
+
 return <div className="h-screen w-screen bg-[var(--color-gray-200)] flex justify-center items-center">
 
   <div className="bg-white rounded-xl border-1 border-gray-300  min-w-48 p-10">
-    <Input placeholder="Email Address" ref={userNameRef} required={true} />
-    <Input placeholder="Password" ref={passwordRef} required={true} />
+    <Input type="text" placeholder="username" value={username} onChange={(e) => setUsername(e.target.value)}  required={true} />
+    <Input type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required={true} />
     <div className="flex justify-center items-center pt-4">
       <Button  variant="primary" text="Signin" fullWidth= {true} loading={loading} onClick={handleSubmit} />
     </div>
