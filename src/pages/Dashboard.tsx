@@ -170,9 +170,9 @@ export function Dashboard() {
         )}
 
         <div className="flex gap-6 flex-wrap p-4">
-          {contents.map(({ type, link, title, description, _id, tags }) => (
+          {contents.map(({ type, link, title, description, _id, tags }, index) => (
             <Card
-              key={`${type}-${link}`}
+              key={`${_id}-${index}`}
               type={type as "twitter" | "youtube" | "article" | "note"}
               link={link}
               title={title}

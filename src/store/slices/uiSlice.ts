@@ -25,7 +25,7 @@ export const generateShareLink = createAsyncThunk(
       {share: true},
       {headers: {Authorization: token}}
     );
-    const hash = response.data.hash || "";
+    const hash = response.data.data.hash || "";
 
     const baseUrl = FRONTEND_URL.endsWith("/") ? FRONTEND_URL.slice(0,-1) : FRONTEND_URL;
     const shareLink = `${baseUrl}/share/${hash}`;

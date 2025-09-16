@@ -189,13 +189,28 @@ export function CreateContentModal({
   return (
     <div>
       {open && (
-        <div>
-          <div className="w-screen h-screen bg-slate-500 fixed top-0 left-0 opacity-60 flex justify-center"></div>
-          <div className="w-screen h-screen fixed top-0 left-0 flex justify-center">
-            <div ref={modref} className="flex flex-col justify-center">
-              <span className="bg-white opacity-100 rounded p-4">
+        <div className="fixed inset-0 z-50">
+          {/* Backdrop */}
+          <div 
+            className="w-screen h-screen bg-slate-500 opacity-60 fixed top-0 left-0"
+            onClick={onClose}
+          ></div>
+          
+          {/* Modal Content */}
+          <div className="w-screen h-screen fixed top-0 left-0 flex justify-center items-center pointer-events-none">
+            <div 
+              ref={modref} 
+              className="bg-white rounded p-4 pointer-events-auto relative z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
                 <div className="flex justify-end">
-                  <div onClick={onClose} className="cursor-pointer">
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClose();
+                    }} 
+                    className="cursor-pointer"
+                  >
                     <CrossIcon />
                   </div>
                 </div>
@@ -251,7 +266,6 @@ export function CreateContentModal({
                 <div className="flex justify-center">
                   <Button variant="primary" text="submit" size="sm" onClick={addContent}  loading={loading} />
                 </div>
-              </span>
             </div>
           </div>
         </div>
