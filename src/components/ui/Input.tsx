@@ -62,7 +62,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="mb-4">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -76,26 +76,44 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             required={required}
             autoComplete={autoComplete}
             className={`
-              w-full px-4 py-2 border rounded-md transition-colors duration-200
+              w-full px-4 py-3 bg-muted border rounded-lg transition-all duration-200 text-foreground placeholder:text-muted-foreground
               ${hasError 
-                ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" 
-                : "border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50 dark:bg-red-950/20" 
+                : "border-border focus:border-primary focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground"
               }
-              ${touched && !error ? "border-green-500" : ""}
-              focus:outline-none
+              ${touched && !error ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""}
+              focus:outline-none focus:bg-background
             `}
             {...(value !== undefined ? { value, onChange } : { defaultValue })}
             onBlur={onBlur}
-            aria-invalid={!!hasError}
+            aria-invalid={hasError ? "true" : "false"}
             aria-describedby={hasError ? `${name}-error` : undefined}
           />
+          
+          {/* Success checkmark - positioned to the left of password toggle if present */}
+          {touched && !error && !showPasswordToggle && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          )}
+          
+          {/* Success checkmark for password fields - positioned to the left of toggle */}
+          {touched && !error && showPasswordToggle && type === "password" && (
+            <div className="absolute right-12 top-1/2 transform -translate-y-1/2 text-green-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+          )}
           
           {/* Password visibility toggle */}
           {showPasswordToggle && type === "password" && (
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none transition-colors p-1"
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? (
@@ -116,25 +134,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               )}
             </button>
           )}
-          
-          {/* Success checkmark */}
-          {touched && !error && (
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-green-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          )}
         </div>
         
         {/* Helper text or error message */}
         {hasError && (
-          <p id={`${name}-error`} className="mt-1 text-sm text-red-600" role="alert">
+          <p id={`${name}-error`} className="mt-2 text-sm text-red-600 flex items-center gap-1" role="alert">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             {error}
           </p>
         )}
         {!hasError && helperText && (
-          <p className="mt-1 text-sm text-gray-500">{helperText}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{helperText}</p>
         )}
       </div>
     );
@@ -171,7 +183,7 @@ export const MultiInput = forwardRef<HTMLTextAreaElement, MultiInputProps>(
     return (
       <div className="mb-4">
         {label && (
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-2">
             {label}
             {required && <span className="text-red-500 ml-1">*</span>}
           </label>
@@ -185,26 +197,28 @@ export const MultiInput = forwardRef<HTMLTextAreaElement, MultiInputProps>(
             rows={rows}
             maxLength={maxLength}
             className={`
-              w-full px-4 py-2 border rounded-md transition-colors duration-200 resize-vertical
+              w-full px-4 py-3 bg-muted border rounded-lg transition-all duration-200 resize-vertical text-foreground placeholder:text-muted-foreground
               ${hasError 
-                ? "border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500" 
-                : "border-gray-300 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
+                ? "border-red-500 focus:border-red-500 focus:ring-2 focus:ring-red-500/20 bg-red-50 dark:bg-red-950/20" 
+                : "border-border focus:border-primary focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground"
               }
-              ${touched && !error ? "border-green-500" : ""}
-              focus:outline-none
+              ${touched && !error ? "border-green-500 bg-green-50 dark:bg-green-950/20" : ""}
+              focus:outline-none focus:bg-background min-h-[120px]
             `}
             {...(value !== undefined 
               ? { value, onChange: handleChange } 
               : { defaultValue, onChange: handleChange }
             )}
             onBlur={onBlur}
-            aria-invalid={!!hasError}
+            aria-invalid={hasError ? "true" : "false"}
             aria-describedby={hasError ? `${name}-error` : undefined}
           />
           
           {/* Character count */}
           {maxLength && (
-            <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+            <div className={`absolute bottom-3 right-3 text-xs px-2 py-1 rounded bg-background border ${
+              charCount > maxLength * 0.9 ? "text-orange-500 border-orange-200" : "text-muted-foreground border-border"
+            }`}>
               {charCount}/{maxLength}
             </div>
           )}
@@ -212,12 +226,15 @@ export const MultiInput = forwardRef<HTMLTextAreaElement, MultiInputProps>(
         
         {/* Helper text or error message */}
         {hasError && (
-          <p id={`${name}-error`} className="mt-1 text-sm text-red-600" role="alert">
+          <p id={`${name}-error`} className="mt-2 text-sm text-red-600 flex items-center gap-1" role="alert">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             {error}
           </p>
         )}
         {!hasError && helperText && (
-          <p className="mt-1 text-sm text-gray-500">{helperText}</p>
+          <p className="mt-2 text-sm text-muted-foreground">{helperText}</p>
         )}
       </div>
     );
@@ -262,26 +279,64 @@ export const PasswordStrengthIndicator = ({ password, show }: PasswordStrengthIn
   const strength = getStrength();
 
   return (
-    <div className="mt-2">
-      <div className="flex justify-between items-center mb-1">
-        <span className="text-xs text-gray-600">Password strength</span>
-        <span className="text-xs font-medium text-gray-700">{strength.label}</span>
+    <div className="mt-3 p-3 bg-muted border border-border rounded-lg">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-xs font-medium text-foreground">Password strength</span>
+        <span className={`text-xs font-semibold ${
+          strength.score <= 2 ? "text-red-600" : 
+          strength.score <= 3 ? "text-yellow-600" : "text-green-600"
+        }`}>
+          {strength.label}
+        </span>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-2">
+      <div className="w-full bg-background rounded-full h-2 mb-3">
         <div 
-          className={`h-2 rounded-full transition-all duration-300 ${strength.color}`}
+          className={`h-2 rounded-full transition-all duration-500 ${strength.color}`}
           style={{ width: `${strength.percentage}%` }}
         />
       </div>
-      <ul className="mt-2 text-xs text-gray-600 space-y-1">
-        <li className={password.length >= 8 ? "text-green-600" : ""}>
-          ✓ At least 8 characters
+      <ul className="text-xs space-y-1">
+        <li className={`flex items-center gap-2 ${
+          password.length >= 8 ? "text-green-600" : "text-muted-foreground"
+        }`}>
+          <span className={`w-3 h-3 rounded-full border ${
+            password.length >= 8 ? "bg-green-500 border-green-500" : "border-muted-foreground"
+          }`}>
+            {password.length >= 8 && (
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </span>
+          At least 8 characters
         </li>
-        <li className={/[a-z]/.test(password) && /[A-Z]/.test(password) ? "text-green-600" : ""}>
-          ✓ Upper and lowercase letters
+        <li className={`flex items-center gap-2 ${
+          /[a-z]/.test(password) && /[A-Z]/.test(password) ? "text-green-600" : "text-muted-foreground"
+        }`}>
+          <span className={`w-3 h-3 rounded-full border ${
+            /[a-z]/.test(password) && /[A-Z]/.test(password) ? "bg-green-500 border-green-500" : "border-muted-foreground"
+          }`}>
+            {/[a-z]/.test(password) && /[A-Z]/.test(password) && (
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </span>
+          Upper and lowercase letters
         </li>
-        <li className={/[!@#$%^&*]/.test(password) ? "text-green-600" : ""}>
-          ✓ At least one special character (!@#$%^&*)
+        <li className={`flex items-center gap-2 ${
+          /[!@#$%^&*]/.test(password) ? "text-green-600" : "text-muted-foreground"
+        }`}>
+          <span className={`w-3 h-3 rounded-full border ${
+            /[!@#$%^&*]/.test(password) ? "bg-green-500 border-green-500" : "border-muted-foreground"
+          }`}>
+            {/[!@#$%^&*]/.test(password) && (
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </span>
+          At least one special character (!@#$%^&*)
         </li>
       </ul>
     </div>

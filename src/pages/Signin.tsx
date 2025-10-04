@@ -7,6 +7,9 @@ import { Input } from "../components/ui/Input";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { signinUser, clearError } from "../store/slices/authSlice";
 import { useValidation, signinSchema, parseApiError } from "../utils/validation";
+import { ArrowLeft, Moon, Sun } from 'lucide-react';
+import { useTheme } from "../hooks/useTheme";
+import { toggleDarkMode } from "../store/slices/uiSlice";
 
 export function Signin() {
   const [formData, setFormData] = useState({
@@ -18,7 +21,8 @@ export function Signin() {
   const dispatch = useAppDispatch();
   const { loading, isAuthenticated } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
-  
+  const { isDarkMode, theme } = useTheme();
+
   const {
     errors,
     touched,
@@ -60,6 +64,10 @@ export function Signin() {
     markFieldTouched(field);
     validateField(field, formData[field], formData);
   };
+
+  const handleToggle = () => {
+    dispatch(toggleDarkMode())
+  }
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -126,92 +134,118 @@ export function Signin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
-          <p className="text-gray-600">Sign in to continue to Brainly</p>
+    <div className="min-h-screen bg-background flex justify-center items-center p-4">
+      <div>
+        <div className="mb-5 flex justify-between items-center">
+          <Button 
+            size="sm" 
+            fullWidth={false} 
+            startIcon={<ArrowLeft/>} 
+            text="Back to Home" 
+            onClick={() => navigate("/")} 
+            className="text-muted-foreground hover:text-foreground transition-colors hover:bg-muted"
+          />
+
+          <button
+            onClick={handleToggle}
+            className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted"
+            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </button>
         </div>
-
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <Input
-            name="username"
-            type="text"
-            label="Username"
-            placeholder="Enter your username"
-            value={formData.username}
-            required
-            onChange={handleInputChange("username")}
-            onBlur={handleBlur("username")}
-            error={getFieldError("username")}
-            touched={touched.has("username")}
-            autoComplete="username"
-          />
-
-          <Input
-            name="password"
-            type="password"
-            label="Password"
-            placeholder="Enter your password"
-            value={formData.password}
-            required
-            onChange={handleInputChange("password")}
-            onBlur={handleBlur("password")}
-            error={getFieldError("password")}
-            touched={touched.has("password")}
-            showPasswordToggle
-            autoComplete="current-password"
-          />
-
-          <div className="flex items-center justify-between">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-              />
-              <span className="ml-2 text-sm text-gray-600">Remember me</span>
-            </label>
-            
-            <button
-              type="button"
-              onClick={handleForgotPassword}
-              className="text-sm text-purple-600 hover:text-purple-700 font-medium"
-            >
-              Forgot password?
-            </button>
+        
+        <div className="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
+            <p className="text-muted-foreground">Sign in to continue to Brainly</p>
           </div>
 
-          <div className="pt-4">
-            <Button
-              variant="primary"
-              text={loading ? "Signing In..." : "Sign In"}
-              fullWidth
-              loading={loading}
-              onClick={handleSubmit}
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <Input
+              name="username"
+              type="text"
+              label="Username"
+              placeholder="Enter your username"
+              value={formData.username}
+              required
+              onChange={handleInputChange("username")}
+              onBlur={handleBlur("username")}
+              error={getFieldError("username")}
+              touched={touched.has("username")}
+              autoComplete="username"
             />
+
+            <Input
+              name="password"
+              type="password"
+              label="Password"
+              placeholder="Enter your password"
+              value={formData.password}
+              required
+              onChange={handleInputChange("password")}
+              onBlur={handleBlur("password")}
+              error={getFieldError("password")}
+              touched={touched.has("password")}
+              showPasswordToggle
+              autoComplete="current-password"
+            />
+
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 border-border rounded focus:ring-primary"
+                />
+                <span className="ml-2 text-sm text-muted-foreground hover:text-foreground">Remember me</span>
+              </label>
+              
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                className="text-sm text-muted-foreground hover:text-foreground font-medium"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            <div className="pt-4">
+              <Button
+                variant="primary"
+                text={loading ? "Signing In..." : "Sign In"}
+                fullWidth
+                loading={loading}
+                onClick={handleSubmit}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 dark:text-primary-foreground "
+              />
+            </div>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Don't have an account?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/signup")}
+                className="text-foreground hover:text-primary font-medium transition-colors cursor-pointer"
+              >
+                Sign Up
+              </button>
+            </p>
           </div>
-        </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
-            <button
-              type="button"
-              onClick={() => navigate("/signup")}
-              className="text-purple-600 hover:text-purple-700 font-medium transition-colors"
-            >
-              Sign Up
-            </button>
-          </p>
-        </div>
-
-        {/* Demo credentials notice (remove in production) */}
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <p className="text-xs text-center text-blue-700">
-            <strong>Demo Account:</strong> You can create a new account or use your existing credentials
-          </p>
+          {/* Demo credentials notice */}
+          <div className="mt-6 p-4 bg-muted rounded-lg">
+            <p className="text-xs text-center text-muted-foreground">
+              <strong className="text-foreground">Demo Account:</strong> You can create a new account or use your existing credentials
+            </p>
+          </div>
         </div>
       </div>
     </div>

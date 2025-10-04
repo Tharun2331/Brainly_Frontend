@@ -1,9 +1,23 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type UIState } from '../types/index';
 import axios from "axios";
+import { boolean } from 'zod';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";
+
+
+const getInitialDarkMode = (): boolean => {
+  if (typeof window !== 'undefined') {
+    const savedTheme = localStorage.getItem('darkMode');
+    if (savedTheme !== null) {
+      return JSON.parse(savedTheme);
+    }
+    // Check system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  return false;
+};
 
 
 const initialState: UIState = {
@@ -15,7 +29,11 @@ const initialState: UIState = {
   selectedNote: null,
   shareLoading: false,
   shareError:null,
+  isDarkMode: getInitialDarkMode(),
 };
+
+
+
 
 export const generateShareLink = createAsyncThunk(
   'ui/generateShareLink',
@@ -47,6 +65,33 @@ const uiSlice = createSlice({
     toggleShareModal: (state) => {
       state.modals.share = !state.modals.share;
     },
+    toggleDarkMode: (state) => {
+      state.isDarkMode = !state.isDarkMode;
+
+      if(typeof window !== 'undefined') {
+        localStorage.setItem('darkMode', JSON.stringify(state.isDarkMode));
+        // Apply dark class to document
+        if (state.isDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+      },
+      setDarkMode: (state, action: PayloadAction<boolean>) => {
+        state.isDarkMode = action.payload;
+      // Save to localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('darkMode', JSON.stringify(state.isDarkMode));
+        // Apply dark class to document
+        if (state.isDarkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      }
+    },
+
     setShareLink: (state, action: PayloadAction<string>) => {
       state.shareLink = action.payload;
     },
@@ -89,6 +134,8 @@ export const {
   setShareLink, 
   setSelectedNote, 
   closeAllModals,
-  clearShareLink 
+  clearShareLink,
+  toggleDarkMode,
+  setDarkMode
 } = uiSlice.actions;
 export default uiSlice.reducer;

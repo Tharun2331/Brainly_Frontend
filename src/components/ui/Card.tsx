@@ -32,8 +32,6 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
   const [embedError, setEmbedError] = useState(false);
   const tweetRenderedRef = useRef(false);
   
-  // Debug: Log when Card component renders
-  console.log(`Card rendered: ${type} - ${contentId} - ${title}`);
 
   // Truncate description to ~100 characters (~3 lines)
   const safeDescription = description || "";
@@ -143,14 +141,14 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
   return (
     <div>
       <div 
-        className={`p-4 bg-white rounded-md shadow-md border-gray-200 border max-w-72 text-sm font-normal min-h-48 min-w-72 overflow-hidden ${
+        className={`p-4 bg-card  rounded-md shadow-md border border-border max-w-72 text-sm font-normal min-h-48 min-w-72 overflow-hidden ${
           type === "note" ? "cursor-pointer hover:shadow-lg transition-shadow duration-200" : ""
         }`}
         onClick={type === "note" ? handleNoteClick : undefined}
       >
         <div className="flex justify-between">
           <div className="flex items-center min-w-0 flex-1">
-            <div className="text-gray-500 pr-2 flex-shrink-0">
+            <div className="text-muted-foreground pr-2 flex-shrink-0">
               {type === "youtube" && <YoutubeIcon />}
               {type === "twitter" && <TwitterIcon />}
               {type === "article" && <ArticleIcon />}
@@ -162,7 +160,7 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
           </div>
           <div className="flex items-center">
             {link && (
-              <div className="pr-2 text-gray-400">
+              <div className="pr-2 text-muted-foreground ">
                 <a 
                   href={link} 
                   target="_blank" 
@@ -174,7 +172,7 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
               </div>
             )}
             <div 
-              className="pr-2 text-gray-400 cursor-pointer hover:text-red-500 transition-colors duration-200" 
+              className="pr-2 text-muted-foreground  cursor-pointer hover:text-chart-4 transition-colors duration-200" 
               onClick={handleDelete}
             >
               <DeleteIcon size="md" />
@@ -184,7 +182,7 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
         <div className="pt-4 overflow-hidden">
           {type === "youtube" && link && (
             <iframe
-              className="w-full h-48 rounded"
+              className="w-full rounded"
               src={link.replace("watch", "embed").replace("?v=", "/").replace("&", "/")}
               title="YouTube video player"
               frameBorder="0"
@@ -197,7 +195,7 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
             <div className="overflow-hidden">
               <blockquote ref={tweetRef} className="twitter-tweet max-w-full">
                 {embedError && (
-                  <div className="text-gray-500 italic w-full break-words">
+                  <div className="text-muted-foreground italic w-full break-words">
                     Tweet not available for embedding. View on{" "}
                     <a href={link} target="_blank" rel="noopener noreferrer" className="underline">
                       Twitter/X
@@ -209,7 +207,7 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
             </div>
           )}
           {type === "article" && link && (
-            <div className="text-gray-500 italic overflow-hidden">
+            <div className="text-muted-foreground italic overflow-hidden">
               <Link to={link} target="_blank" rel="noopener noreferrer">
                 <LinesIcon />
               </Link>
@@ -217,10 +215,10 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
           )}
           
           {type === "note" && (
-            <div className="text-gray-700 hover:text-gray-900 transition-colors duration-200 overflow-hidden">
+            <div className="text-foreground hover:text-foreground/80 transition-colors duration-200 overflow-hidden">
               <p className="break-words">{truncatedDescription}</p>
               {type === "note" && (
-                <div className="mt-2 text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <div className="mt-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   Click to edit
                 </div>
               )}
@@ -239,7 +237,7 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
               return tagText && typeof tagText === 'string' ? (
                 <span
                   key={tagId}
-                  className="bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full text-xs"
+                  className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 px-2 py-1 rounded-full text-xs"
                 >
                   #{tagText}
                 </span>

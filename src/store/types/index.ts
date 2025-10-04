@@ -53,4 +53,5 @@ export interface UIState {
   } | null;
   shareLoading: boolean;
   shareError: string | null;
+  isDarkMode: boolean;
 }

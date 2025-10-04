@@ -1,15 +1,13 @@
 // src/components/ui/CreateContentModal.tsx
 import { useEffect, useRef, useState } from "react";
-import { CrossIcon } from "../../icons/CrossIcon";
 import { Button } from "./Button";
 import { Input, MultiInput } from "./Input";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { Note } from "../../components/ui/Note";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { createContent, updateContent, fetchContents } from "../../store/slices/contentSlice";
-
 import { toast } from "react-toastify";
-
+import { Twitter, Youtube, FileText, StickyNote, X } from "lucide-react";
 
 // @ts-ignore
 enum ContentType {
@@ -185,35 +183,91 @@ export function CreateContentModal({
     }
   };
 
-
   return (
     <div>
       {open && (
         <div className="fixed inset-0 z-50">
-          {/* Backdrop */}
+          {/* Backdrop - Modern overlay with blur effect */}
           <div 
-            className="w-screen h-screen bg-slate-500 opacity-60 fixed top-0 left-0"
+            className="w-screen h-screen bg-black/50 backdrop-blur-sm fixed top-0 left-0 transition-opacity duration-200"
             onClick={onClose}
           ></div>
           
           {/* Modal Content */}
-          <div className="w-screen h-screen fixed top-0 left-0 flex justify-center items-center pointer-events-none">
+          <div className="w-screen h-screen fixed top-0 left-0 flex justify-center items-center p-4 pointer-events-none">
             <div 
               ref={modref} 
-              className="bg-white rounded p-4 pointer-events-auto relative z-10"
+              className="bg-card border border-border rounded-xl shadow-2xl p-6 pointer-events-auto relative z-10 w-full max-w-sm max-h-[90vh] overflow-y-auto transform transition-all duration-200 scale-100"
               onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex justify-end">
-                  <div 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onClose();
-                    }} 
-                    className="cursor-pointer"
-                  >
-                    <CrossIcon />
-                  </div>
+              {/* Header with close button */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-foreground">
+                  {selectedNote ? "Edit Content" : "Add New Content"}
+                </h2>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }} 
+                  className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-lg hover:bg-muted"
+                  aria-label="Close modal"
+                >
+                  <X />
+                </button>
+              </div>
+
+              {/* Content Type Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-foreground mb-3">
+                  Content Type
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    text="Youtube"
+                    onClick={() => setType(ContentType.Youtube)}
+                    loading={loading}
+                    startIcon={<Youtube size={20} />}
+                    className={`w-full ${type === ContentType.Youtube ? 
+                      "bg-chart-4/90 hover:bg-chart-4 text-primary-foreground" : 
+                      "bg-background border border-border text-foreground hover:bg-muted"
+                    }`}
+                  />
+                  <Button
+                    text="Twitter"
+                    onClick={() => setType(ContentType.Twitter)}
+                    startIcon={<Twitter size={20} />}
+                    loading={loading}
+                    className={`w-full ${type === ContentType.Twitter ? 
+                      "bg-chart-1/90 hover:bg-chart-1  text-primary-foreground" : 
+                      "bg-background border border-border text-foreground hover:bg-muted"
+                    }`}
+                  />
+                  <Button
+                    text="Article"
+                    onClick={() => setType(ContentType.Article)}
+                    startIcon={<FileText size={20} />}
+                    loading={loading}
+                    className={`w-full ${type === ContentType.Article ? 
+                      "bg-chart-2/90 hover:bg-chart-2  text-primary-foreground" : 
+                      "bg-background border border-border text-foreground hover:bg-muted"
+                    }`}
+                  />
+                  <Button
+                    text="Note"
+                    onClick={() => setType(ContentType.Note)}
+                    startIcon={<StickyNote size={20} />}
+                    loading={loading}
+                    className={`w-full ${type === ContentType.Note ? 
+                      "bg-chart-3/90 hover:bg-chart-3 text-primary-foreground" : 
+                      "bg-background border border-border text-foreground hover:bg-muted"
+                    }`}
+                  />
                 </div>
+              </div>
+
+              {/* Form Content */}
+              <div className="space-y-4 mb-6">
                 {type === ContentType.Note ? (
                   <Note 
                     ref={noteRef} 
@@ -225,47 +279,33 @@ export function CreateContentModal({
                     key={`note-${selectedNote?._id || 'new'}`} // Force re-render when selectedNote changes
                   />
                 ) : (
-                  <div key={`content-${type}`}>
+                  <div key={`content-${type}`} className="space-y-4">
                     <Input ref={titleRef} placeholder={"Title"} required={true} />
                     <Input ref={linkRef} placeholder={"Link"} required={true} />
-                    <Input ref={tagRef} placeholder={"Tags"} required={true} />
+                    <Input ref={tagRef} placeholder={"Tags (comma separated)"} required={true} />
                     <MultiInput ref={descriptionRef} placeholder={"Description"} required={true} />
                   </div>
                 )}
-                {error && <div className="text-red-500 text-center">{error}</div>}
-                <div className="flex flex-wrap justify-center gap-2 p-4 w-68">
-                  <Button
-                    text="Youtube"
-                    variant={type === ContentType.Youtube ? "primary" : "secondary"}
-                    onClick={() => setType(ContentType.Youtube)}
-                    size="md"
-                    loading={loading}
-                  />
-                  <Button
-                    text="Twitter"
-                    variant={type === ContentType.Twitter ? "primary" : "secondary"}
-                    onClick={() => setType(ContentType.Twitter)}
-                    size="md"
-                    loading={loading}
-                  />
-                  <Button
-                    text="Article"
-                    variant={type === ContentType.Article ? "primary" : "secondary"}
-                    onClick={() => setType(ContentType.Article)}
-                    size="md"
-                    loading={loading}
-                  />
-                  <Button
-                    text="Note"
-                    variant={type === ContentType.Note ? "primary" : "secondary"}
-                    onClick={() => setType(ContentType.Note)}
-                    size="md"
-                    loading={loading}
-                  />
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-700 text-sm">{error}</p>
                 </div>
-                <div className="flex justify-center">
-                  <Button variant="primary" text="submit" size="sm" onClick={addContent}  loading={loading} />
-                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-border">
+                <Button 
+                  text={selectedNote ? "Update Content" : "Add Content"}
+                  fullWidth={true} 
+                  size="md" 
+                  onClick={addContent}  
+                  loading={loading}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                />
+              </div>
             </div>
           </div>
         </div>

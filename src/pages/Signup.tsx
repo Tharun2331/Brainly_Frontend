@@ -7,6 +7,9 @@ import { Input, PasswordStrengthIndicator } from "../components/ui/Input";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { signupUser, clearError } from "../store/slices/authSlice";
 import { useValidation, signupSchema, parseApiError } from "../utils/validation";
+import { ArrowLeft, Moon, Sun } from 'lucide-react';
+import { toggleDarkMode } from "../store/slices/uiSlice";
+import { useTheme } from "../hooks/useTheme";
 
 export function Signup() {
   const [formData, setFormData] = useState({
@@ -17,6 +20,9 @@ export function Signup() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector(state => state.auth);
+  
+  // Use the theme hook - this handles all dark mode initialization and syncing
+  const { isDarkMode, theme } = useTheme();
   
   const {
     touched,
@@ -108,83 +114,114 @@ export function Signup() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl border border-gray-200 w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
-          <p className="text-gray-600">Join Brainly to start organizing your content</p>
-        </div>
+  const handleToggle = () => {
+    dispatch(toggleDarkMode())
+  }
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <Input
-            name="username"
-            type="text"
-            label="Username"
-            placeholder="Choose a username"
-            value={formData.username}
-            required
-            onChange={handleInputChange("username")}
-            onBlur={handleBlur("username")}
-            error={getFieldError("username")}
-            touched={touched.has("username")}
-            helperText="3-20 characters, letters, numbers, and underscores only"
-            autoComplete="username"
+  return (
+    <div className="min-h-screen bg-background flex justify-center items-center p-4">
+      <div>
+        <div className="flex justify-between items-center mb-5">
+          <Button 
+            size="sm" 
+            fullWidth={false} 
+            startIcon={<ArrowLeft/>} 
+            text="Back to Home" 
+            onClick={() => navigate("/")} 
+            className="text-muted-foreground hover:text-foreground transition-colors hover:bg-muted"
           />
 
-          <div>
-            <Input
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="Create a strong password"
-              value={formData.password}
-              required
-              onChange={handleInputChange("password")}
-              onBlur={handleBlur("password")}
-              error={getFieldError("password")}
-              touched={touched.has("password")}
-              showPasswordToggle
-              autoComplete="new-password"
-            />
-            <PasswordStrengthIndicator 
-              password={formData.password} 
-              show={formData.password.length > 0}
-            />
-          </div>
-
-          <div className="pt-4">
-            <Button
-              variant="primary"
-              text={loading ? "Creating Account..." : "Sign Up"}
-              fullWidth
-              loading={loading}
-              onClick={handleSubmit}
-            />
-          </div>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
-            Already have an account?{" "}
-            <button
-              type="button"
-              onClick={() => navigate("/signin")}
-              className="text-purple-600 hover:text-purple-700 font-medium transition-colors"
-            >
-              Sign In
-            </button>
-          </p>
+          <button 
+            onClick={handleToggle}
+            className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted"
+            aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </button> 
         </div>
 
-        {/* Terms and Privacy Notice */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-xs text-center text-gray-500">
-            By signing up, you agree to our{" "}
-            <a href="#" className="text-purple-600 hover:underline">Terms of Service</a>
-            {" "}and{" "}
-            <a href="#" className="text-purple-600 hover:underline">Privacy Policy</a>
-          </p>
+        <div className="bg-card border border-border rounded-2xl shadow-xl w-full max-w-md p-8">
+          
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-foreground mb-2">Create Account</h1>
+            <p className="text-muted-foreground">Join Brainly to start organizing your content</p>
+          </div>
+
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
+            <Input
+              name="username"
+              type="text"
+              label="Username"
+              placeholder="Choose a username"
+              value={formData.username}
+              required
+              onChange={handleInputChange("username")}
+              onBlur={handleBlur("username")}
+              error={getFieldError("username")}
+              touched={touched.has("username")}
+              helperText="3-20 characters, letters, numbers, and underscores only"
+              autoComplete="username"
+            />
+
+            <div>
+              <Input
+                name="password"
+                type="password"
+                label="Password"
+                placeholder="Create a strong password"
+                value={formData.password}
+                required
+                onChange={handleInputChange("password")}
+                onBlur={handleBlur("password")}
+                error={getFieldError("password")}
+                touched={touched.has("password")}
+                showPasswordToggle
+                autoComplete="new-password"
+              />
+              <PasswordStrengthIndicator 
+                password={formData.password} 
+                show={formData.password.length > 0}
+              />
+            </div>
+
+            {/* Spacer div to match signin's checkbox/forgot password section */}
+            <div className="h-6"></div>
+
+            <div className="pt-4">
+              <Button
+                variant="primary"
+                text={loading ? "Creating Account..." : "Sign Up"}
+                fullWidth
+                loading={loading}
+                onClick={handleSubmit}
+                className="bg-primary dark:text-black text-primary-foreground hover:bg-primary/90 "
+              />
+            </div>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              Already have an account?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/signin")}
+                className="text-foreground hover:text-primary font-medium transition-colors cursor-pointer "
+              >
+                Sign In
+              </button>
+            </p>
+          </div>
+
+          {/* Demo notice to match signin height - replace terms with demo info */}
+          <div className="mt-6 p-4 bg-muted rounded-lg">
+            <p className="text-xs text-center text-muted-foreground">
+              <strong className="text-foreground">Create Account:</strong> Choose a unique username and secure password
+            </p>
+          </div>
         </div>
       </div>
     </div>

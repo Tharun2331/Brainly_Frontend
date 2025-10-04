@@ -11,7 +11,11 @@ import { generateShareLink, clearShareLink } from "../store/slices/uiSlice";
 import { toast } from "react-toastify";
 import { useAppDispatch,useAppSelector } from "../hooks/redux";
 import { deleteContent, fetchContents } from "../store/slices/contentSlice";
-// import { ChatIcon } from "../icons/ChatIcon";
+import {  MessageCircle   } from "lucide-react";
+import {Moon, Sun} from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
+import { toggleDarkMode } from "../store/slices/uiSlice";
+import SearchBar from "../components/ui/SearchBar";
 
 export function Dashboard() {
   const dispatch = useAppDispatch();
@@ -19,6 +23,7 @@ export function Dashboard() {
   const {shareLoading, shareError} = useAppSelector(state => state.ui);
   const {contents, filter} = useAppSelector(state => state.content);
   const [modalOpen, setModalOpen] = useState(false);
+  const {isDarkMode} = useTheme();
 
   const [selectedNote, setSelectedNote] = useState<{
     _id: string;
@@ -128,10 +133,14 @@ export function Dashboard() {
     
   }
 
+  const handleToggleDarkMode = () => {
+    dispatch(toggleDarkMode());
+  };
+
   return (
     <div>
       <Sidebar />
-      <div className="p-4 ml-4 md:ml-72 min-h-screen bg-[var(--color-gray-200)]">
+      <div className="p-4 ml-4 md:ml-72 min-h-screen bg-background">
         <CreateContentModal open={modalOpen}
           onClose={() => { 
           setModalOpen(false) 
@@ -139,14 +148,40 @@ export function Dashboard() {
           }}
           selectedNote = {selectedNote}
        />
-        <div className="flex justify-center  md:flex md:justify-end gap-4">
+        <div className="flex justify-center  md:flex md:justify-between gap-4">
+        <div className="flex-1 max-w-md">
+          <SearchBar  />
+        </div>
+        <div className="flex items-center gap-3">
+        <button
+          onClick={handleToggleDarkMode}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-background rounded-md hover:bg-muted transition-colors"
+          aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {isDarkMode ? (
+              <>
+                <Sun className="w-4 h-4"  />
+              </>
+            ) : (
+              <>
+              <Moon className="w-4 h-4" />
+              </>
+            )}
+          </button>
+          
+          <Button 
+          startIcon = {<MessageCircle size={20}  />}
+          text="Chat"
+          size="md"
+          className="bg-background border border-border hover:bg-secondary/50 rounded-xl"
+          />
           <Button
             startIcon={<ShareIcon size="md" />}
-            variant="secondary"
             text={shareLoading ? "Generating..." : "Share Brain"}
             size="md"
             onClick={handleShare}
             loading={shareLoading}
+            className="bg-background border border-border hover:bg-secondary/50 rounded-xl"
           />
           <Button
             onClick={() => setModalOpen(true)}
@@ -154,8 +189,10 @@ export function Dashboard() {
             variant="primary"
             text="Add Content"
             size="md"
+            className="hover:bg-primary/90 dark:text-primary-foreground rounded-xl"
 
           />
+        </div>
         </div>
         {shareError && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mt-4">
@@ -166,6 +203,7 @@ export function Dashboard() {
             >
               Dismiss
             </button>
+
           </div>
         )}
 
