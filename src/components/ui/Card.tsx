@@ -44,10 +44,7 @@ export const Card = ({
   const [embedError, setEmbedError] = useState(false);
   const tweetRenderedRef = useRef(false);
   
-  // Detect dark mode from document or system preference
-  const isDarkMode = 
-    document.documentElement.classList.contains('dark') || 
-    window.matchMedia('(prefers-color-scheme: dark)').matches;
+
   
   // Truncate description to ~100 characters (~3 lines)
   const safeDescription = description || "";

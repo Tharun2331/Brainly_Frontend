@@ -1,4 +1,3 @@
-import React, { type ReactElement } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/Button";
 import { Brain, Share2, BookOpen, Video, FileText, Twitter, Moon, Sun } from "lucide-react";

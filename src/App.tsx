@@ -7,8 +7,6 @@ import { Share } from './pages/Share'
 import {BrowserRouter, Routes, Route} from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import {ProtectedRoute } from './components/ProtectedRoute';
-import { BrainIcon } from './icons/Brainly'
-import Chat from "./components/ui/Chat";
 function App() {
     
   return (

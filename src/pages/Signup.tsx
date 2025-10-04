@@ -22,7 +22,7 @@ export function Signup() {
   const { loading } = useAppSelector(state => state.auth);
   
   // Use the theme hook - this handles all dark mode initialization and syncing
-  const { isDarkMode, theme } = useTheme();
+  const { isDarkMode } = useTheme();
   
   const {
     touched,

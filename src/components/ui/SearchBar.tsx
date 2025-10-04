@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import { performSemanticSearch, setQuery, clearSearch, fetchSearchSuggestions, clearSuggestions } from "../../store/slices/searchSlice";
+import { performSemanticSearch, clearSearch, fetchSearchSuggestions, clearSuggestions } from "../../store/slices/searchSlice";
 import { Search, X, Loader2, Sparkles } from "lucide-react";
 
 export default function SearchBar() {

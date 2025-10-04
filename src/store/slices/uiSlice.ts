@@ -1,7 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { type UIState } from '../types/index';
 import axios from "axios";
-import { boolean } from 'zod';
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173";

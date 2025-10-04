@@ -1,7 +1,3 @@
-import { ArticleIcon } from "../../icons/Article"
-import { BrainIcon } from "../../icons/Brainly"
-import { NoteIcon } from "../../icons/NotesIcon"
-import { YoutubeIcon } from "../../icons/YoutubeIcon"
 import { Button } from "./Button"
 import { SidebarItem } from "./SidebarItem"
 import { useNavigate } from "react-router-dom"
@@ -15,10 +11,7 @@ import {
   FileText,
   StickyNote,
   Grid3X3,
-  ChevronLeft,
-  ChevronRight,
   LogOut,
-  X,
 } from "lucide-react"
 
 export function Sidebar() {

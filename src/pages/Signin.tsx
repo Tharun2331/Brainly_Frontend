@@ -21,7 +21,7 @@ export function Signin() {
   const dispatch = useAppDispatch();
   const { loading, isAuthenticated } = useAppSelector(state => state.auth);
   const navigate = useNavigate();
-  const { isDarkMode, theme } = useTheme();
+  const { isDarkMode } = useTheme();
 
   const {
     errors,
