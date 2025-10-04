@@ -1,45 +1,63 @@
 // src/components/ui/Card.tsx
-import { DeleteIcon } from "../../icons/DeleteIcon";
-import { ShareIcon } from "../../icons/ShareIcon";
 import { useEffect, useRef, useState } from "react";
-import { YoutubeIcon } from "../../icons/YoutubeIcon";
-import { TwitterIcon } from "../../icons/TwitterIcon";
-import { ArticleIcon } from "../../icons/Article";
-import { LinesIcon } from "../../icons/Lines";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
-import { NoteIcon } from "../../icons/NotesIcon";
+import { 
+  Trash2, 
+  ExternalLink, 
+  Youtube, 
+  Twitter, 
+  FileText, 
+  StickyNote 
+} from "lucide-react";
 
 interface Tag {
   _id: string;
   tag: string;
 }
 
+// Allow both Tag objects and plain strings
+type TagInput = Tag | string;
+
 interface Cardprops {
   title?: string;
   link?: string;
   type: "twitter" | "youtube" | "article" | "note";
-  tags?: Tag[] | null; // Allow null
+  tags?: TagInput[] | null;
   contentId: string;
   onDelete?: (contentId: string) => void;
   description?: string;
   onClick?: () => void;
 }
 
-export const Card = ({ title, link, type, contentId, onDelete, tags, description, onClick }: Cardprops) => {
+export const Card = ({ 
+  title, 
+  link, 
+  type, 
+  contentId, 
+  onDelete, 
+  tags, 
+  description, 
+  onClick 
+}: Cardprops) => {
   const tweetRef = useRef<HTMLQuoteElement>(null);
   const [, setTweetLoaded] = useState(false);
   const [embedError, setEmbedError] = useState(false);
   const tweetRenderedRef = useRef(false);
   
-
+  // Detect dark mode from document or system preference
+  const isDarkMode = 
+    document.documentElement.classList.contains('dark') || 
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+  
   // Truncate description to ~100 characters (~3 lines)
   const safeDescription = description || "";
   const truncatedDescription =
-    safeDescription.length > 100 ? safeDescription.substring(0, 100) + "..." : safeDescription;
+    safeDescription.length > 100 
+      ? safeDescription.substring(0, 100) + "..." 
+      : safeDescription;
 
   const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering onClick when deleting
+    e.stopPropagation();
     if (contentId) {
       onDelete && onDelete(contentId);
     } else {
@@ -128,7 +146,6 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
     // Cleanup function
     return () => {
       if (tweetRef.current) {
-        // Clear the tweet content
         tweetRef.current.innerHTML = '';
       }
       tweetRenderedRef.current = false;
@@ -138,59 +155,78 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
   // Ensure tags is an array and handle different data formats
   const safeTags = Array.isArray(tags) ? tags : [];
 
+  // Get icon based on type
+  const getIcon = () => {
+    const iconProps = { className: "w-5 h-5" };
+    switch (type) {
+      case "youtube":
+        return <Youtube {...iconProps} className="w-5 h-5 text-red-600" />;
+      case "twitter":
+        return <Twitter {...iconProps} className="w-5 h-5 text-blue-600" />;
+      case "article":
+        return <FileText {...iconProps} className="w-5 h-5 text-yellow-600" />;
+      case "note":
+        return <StickyNote {...iconProps} className="w-5 h-5 text-green-600" />;
+      default:
+        return <FileText {...iconProps} />;
+    }
+  };
+
   return (
     <div>
       <div 
-        className={`p-4 bg-card  rounded-md shadow-md border border-border max-w-72 text-sm font-normal min-h-48 min-w-72 overflow-hidden ${
+        className={`p-4 bg-card rounded-md shadow-md border border-border w-72 text-sm font-normal min-h-80 overflow-hidden flex flex-col ${
           type === "note" ? "cursor-pointer hover:shadow-lg transition-shadow duration-200" : ""
         }`}
         onClick={type === "note" ? handleNoteClick : undefined}
       >
-        <div className="flex justify-between">
+        {/* Header */}
+        <div className="flex justify-between flex-shrink-0">
           <div className="flex items-center min-w-0 flex-1">
             <div className="text-muted-foreground pr-2 flex-shrink-0">
-              {type === "youtube" && <YoutubeIcon />}
-              {type === "twitter" && <TwitterIcon />}
-              {type === "article" && <ArticleIcon />}
-              {type === "note" && <NoteIcon />}
+              {getIcon()}
             </div>
             <span className="truncate">
               {type === "note" && !title ? "Untitled Note" : title}
             </span>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center gap-1">
             {link && (
-              <div className="pr-2 text-muted-foreground ">
-                <a 
-                  href={link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  onClick={(e) => e.stopPropagation()} // Prevent triggering note edit
-                >
-                  <ShareIcon size="md" />
-                </a>
-              </div>
+              <a 
+                href={link} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="text-muted-foreground hover:text-foreground transition-colors p-1"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </a>
             )}
-            <div 
-              className="pr-2 text-muted-foreground  cursor-pointer hover:text-chart-4 transition-colors duration-200" 
+            <button
               onClick={handleDelete}
+              className="text-muted-foreground hover:text-destructive transition-colors p-1"
             >
-              <DeleteIcon size="md" />
-            </div>
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         </div>
-        <div className="pt-4 overflow-hidden">
+
+        {/* Content */}
+        <div className="pt-4 overflow-hidden flex-1 flex flex-col">
           {type === "youtube" && link && (
-            <iframe
-              className="w-full rounded"
-              src={link.replace("watch", "embed").replace("?v=", "/").replace("&", "/")}
-              title="YouTube video player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            ></iframe>
+            <div className="w-full aspect-video bg-black/5 rounded overflow-hidden">
+              <iframe
+                className="w-full h-full"
+                src={link.replace("watch", "embed").replace("?v=", "/").replace("&", "/")}
+                title="YouTube video player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              ></iframe>
+            </div>
           )}
+
           {type === "twitter" && (
             <div className="overflow-hidden">
               <blockquote ref={tweetRef} className="twitter-tweet max-w-full">
@@ -206,42 +242,67 @@ export const Card = ({ title, link, type, contentId, onDelete, tags, description
               </blockquote>
             </div>
           )}
+
           {type === "article" && link && (
-            <div className="text-muted-foreground italic overflow-hidden">
-              <Link to={link} target="_blank" rel="noopener noreferrer">
-                <LinesIcon />
-              </Link>
+            <div className="flex items-start gap-3 text-muted-foreground p-4 bg-muted rounded-lg h-40">
+              <FileText className="w-8 h-8 flex-shrink-0" />
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-medium text-foreground mb-2">Article</p>
+                <p className="text-xs text-muted-foreground mb-3 line-clamp-3">{truncatedDescription}</p>
+                <a 
+                  href={link}
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs hover:underline inline-flex items-center gap-1"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Read full article <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
             </div>
           )}
           
           {type === "note" && (
-            <div className="text-foreground hover:text-foreground/80 transition-colors duration-200 overflow-hidden">
-              <p className="break-words">{truncatedDescription}</p>
-              {type === "note" && (
-                <div className="mt-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                  Click to edit
-                </div>
-              )}
+            <div className="text-foreground hover:text-foreground/80 transition-colors duration-200 overflow-hidden h-40">
+              <p className="break-words line-clamp-6">{safeDescription}</p>
+              <div className="mt-2 text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                Click to edit
+              </div>
             </div>
           )}
         </div>
 
-        
-        {safeTags && safeTags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-8">
+        {/* Tags - Fixed at bottom */}
+        {safeTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-border flex-shrink-0">
             {safeTags.map((tagObj, index) => {
               // Handle both object format {_id, tag} and string format
-              const tagText = typeof tagObj === 'string' ? tagObj : (tagObj?.tag || tagObj);
-              const tagId = typeof tagObj === 'object' && tagObj._id ? tagObj._id : `tag-${index}`;
+              let tagText: string = '';
+              let tagId: string = `tag-${index}`;
               
-              return tagText && typeof tagText === 'string' ? (
+              if (typeof tagObj === 'string') {
+                // If it's already a string
+                tagText = tagObj;
+                tagId = tagObj;
+              } else if (tagObj && typeof tagObj === 'object') {
+                // If it's an object with _id and tag properties
+                tagText = tagObj.tag || '';
+                tagId = tagObj._id || `tag-${index}`;
+              }
+              
+              // Only render if we have valid tag text
+              if (!tagText || typeof tagText !== 'string') {
+                return null;
+              }
+              
+              return (
                 <span
                   key={tagId}
                   className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 px-2 py-1 rounded-full text-xs"
                 >
                   #{tagText}
                 </span>
-              ) : null;
+              );
             })}
           </div>
         )}

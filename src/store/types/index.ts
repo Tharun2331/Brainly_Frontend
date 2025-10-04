@@ -14,7 +14,7 @@ export interface Content {
   link?: string;
   description: string;
   title: string;
-  tags: Tag[];
+  tags: string[];
   userId?: string;
 
 }

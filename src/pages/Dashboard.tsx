@@ -155,7 +155,7 @@ export function Dashboard() {
         <div className="flex items-center gap-3">
         <button
           onClick={handleToggleDarkMode}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-background rounded-md hover:bg-muted transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground bg-background rounded-md hover:bg-muted transition-colors cursor-pointer"
           aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {isDarkMode ? (
@@ -218,7 +218,7 @@ export function Dashboard() {
               contentId={_id}
               tags={tags}
               onDelete={handleDelete}
-              onClick={() => type === "note" && handleEditNote({_id, title, description, tags: tags?.map(tag => tag.tag) || [] })}
+              onClick={() => type === "note" && handleEditNote({_id, title, description, tags: tags || [] })}
             />
           ))}
         </div>

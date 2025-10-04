@@ -3,12 +3,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import contentReducer from './slices/contentSlice';
 import uiReducer from './slices/uiSlice';
+import searchReducer from "./slices/searchSlice";
+import { Search } from 'lucide-react';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     content: contentReducer,
     ui: uiReducer,
+    search: searchReducer
   },
 
 });
