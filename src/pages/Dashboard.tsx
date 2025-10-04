@@ -136,6 +136,16 @@ export function Dashboard() {
   const handleToggleDarkMode = () => {
     dispatch(toggleDarkMode());
   };
+  
+  const handleChat = () => {
+         toast.success("This feature is coming soon!",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+        }
+      );
+  }
 
   return (
     <div>
@@ -174,6 +184,7 @@ export function Dashboard() {
           text="Chat"
           size="md"
           className="bg-background border border-border hover:bg-secondary/50 rounded-xl"
+          onClick={handleChat}
           />
           <Button
             startIcon={<ShareIcon size="md" />}
