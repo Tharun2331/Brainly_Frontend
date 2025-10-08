@@ -29,6 +29,7 @@ const initialState: UIState = {
   shareLoading: false,
   shareError:null,
   isDarkMode: getInitialDarkMode(),
+  isSidebarOpen:false,
 };
 
 
@@ -63,6 +64,12 @@ const uiSlice = createSlice({
     },
     toggleShareModal: (state) => {
       state.modals.share = !state.modals.share;
+    },
+    toggleSidebar: (state) => {
+      state.isSidebarOpen = !state.isSidebarOpen;
+    },
+    closeSidebar: (state) => {
+      state.isSidebarOpen = false;
     },
     toggleDarkMode: (state) => {
       state.isDarkMode = !state.isDarkMode;
@@ -135,6 +142,8 @@ export const {
   closeAllModals,
   clearShareLink,
   toggleDarkMode,
-  setDarkMode
+  setDarkMode,
+  toggleSidebar,
+  closeSidebar
 } = uiSlice.actions;
 export default uiSlice.reducer;

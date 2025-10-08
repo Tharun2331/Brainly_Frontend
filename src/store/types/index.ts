@@ -54,4 +54,5 @@ export interface UIState {
   shareLoading: boolean;
   shareError: string | null;
   isDarkMode: boolean;
+  isSidebarOpen:boolean;
 }
